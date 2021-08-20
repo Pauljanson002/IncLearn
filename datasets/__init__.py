@@ -1,0 +1,1 @@
+from .ICIFAR100 import ICIFAR100
