@@ -44,10 +44,13 @@ class ICIFAR100(CIFAR100):
         print("the size of test set is %s" % (str(self.TestData.shape)))
         print("the size of test label is %s" % str(self.TestLabels.shape))
 
-    def getTrainData(self, classes):
+    def getTrainData(self, classes,exemplar_set):
 
         datas, labels = [], []
-
+        if len(exemplar_set) != 0:
+            datas = [exemplar for exemplar in exemplar_set]
+            length = len(datas[0])
+            labels = [np.full((length), label) for label in range(len(exemplar_set))]
         for label in range(classes[0], classes[1]):
             data = self.data[np.array(self.targets) == label]
             datas.append(data)

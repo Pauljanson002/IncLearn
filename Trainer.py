@@ -58,6 +58,8 @@ class Trainer:
         self.train_loader = None
         self.test_loader = None
         self.opt = None
+        self.exemplar_set = []
+        self.memory_size = 2000
 
     def beforeTrain(self):
         self.model.eval()
@@ -69,7 +71,7 @@ class Trainer:
         self.model.to(device)
 
     def _get_train_and_test_dataloader(self, classes):
-        self.train_dataset.getTrainData(classes)
+        self.train_dataset.getTrainData(classes,self.exemplar_set)
         self.test_dataset.getTestData(classes)
         train_loader = DataLoader(dataset=self.train_dataset,
                                   shuffle=True,
@@ -134,6 +136,12 @@ class Trainer:
 
     def afterTrain(self, task_id,no_save=False):
         self.model.eval()
+        m = int(self.memory_size / self.num_class)
+        self._reduce_exemplar_sets(m)
+        for i in range(self.num_class - self.task_size, self.num_class):
+            print('construct class %s examplar:' % (i), end='')
+            images = self.train_dataset.get_image_class(i)
+            self._construct_exemplar_set(images, m)
         self.num_class += self.task_size
         self.model.train()
         if no_save:
@@ -147,3 +155,17 @@ class Trainer:
         filename = directory + f'/task_id_{task_id}.pt'
         ensure_dir(directory)
         save_checkpoint(state, filename)
+
+    def _reduce_exemplar_sets(self, m):
+        for index in range(len(self.exemplar_set)):
+            self.exemplar_set[index] = self.exemplar_set[index][:m]
+            print('Size of class %d examplar: %s' % (index, str(len(self.exemplar_set[index]))))
+
+    def _construct_exemplar_set(self, images, m):
+        exemplar = []
+
+        for i in range(m):
+            exemplar.append(images[i])
+
+        print("the size of exemplar :%s" % (str(len(exemplar))))
+        self.exemplar_set.append(exemplar)
