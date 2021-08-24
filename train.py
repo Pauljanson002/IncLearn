@@ -39,6 +39,7 @@ if __name__ == '__main__':
     )
     wandb.run.name = f"task_id : {args.task_id}"
     wandb.watch(trainer.model)
+    print(trainer.model)
     for i in range(1,args.task_id):
         trainer.beforeTrain()
         trainer.train(resume=True,task_id=i)

@@ -39,7 +39,7 @@ class Trainer:
         super(Trainer, self).__init__()
         self.epochs = epochs
         self.learning_rate = learning_rate
-        self.model = get_model('inc_vit_b')
+        self.model = get_model('inc_cct_b')
         self.num_class = num_class
         self.train_transform = transforms.Compose([
             CIFAR10Policy(),

@@ -5,3 +5,4 @@ from .TransformerEncoderBlock import TransformerEncoderBlock
 from .TransformerEncoder import TransformerEncoder
 from .PatchEmbedding import PatchEmbedding
 from .ClassificationHead import ClassificationHead
+from .DropPath import DropPath

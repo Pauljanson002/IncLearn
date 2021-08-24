@@ -6,16 +6,23 @@ from einops.layers.torch import Rearrange
 
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, in_channels=3, patch_size=4, emb_size=256, img_size=32):
+    def __init__(self, in_channels=3, patch_size=4, emb_size=256, img_size=32, convolution=False):
         super(PatchEmbedding, self).__init__()
         self.patch_size = patch_size
         self.sequence_length = (img_size // patch_size) ** 2 + 1
-        self.projection = nn.Conv2d(
-            in_channels=in_channels,
-            out_channels=emb_size,
-            kernel_size=patch_size,
-            stride=patch_size
-        )
+        if convolution:
+            self.projection = nn.Sequential(
+                nn.Conv2d(in_channels, emb_size, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=3,stride=4,padding=1)
+            )
+        else:
+            self.projection = nn.Conv2d(
+                in_channels=in_channels,
+                out_channels=emb_size,
+                kernel_size=patch_size,
+                stride=patch_size
+            )
         self.rearrange = Rearrange('b e (h) (w) -> b (h w) e')
         self.cls_token = nn.Parameter(torch.zeros(1, 1, emb_size), requires_grad=True)
         self.positional_emb = nn.Parameter(PatchEmbedding.sinusoidal_embedding(self.sequence_length, emb_size),
