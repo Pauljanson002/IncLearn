@@ -36,7 +36,7 @@ class MultiHeadAttention(nn.Module):
         self.projection.bias.data = old_projection.bias.data
 
         # Freeze the old heads
-        for head in self.heads:
-            head.requires_grad_(False)
+        # for head in self.heads:
+        #     head.requires_grad_(False)
         new_head = Head(self.in_dim, self.head_dim)
         self.heads.append(new_head)
