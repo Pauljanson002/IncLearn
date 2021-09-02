@@ -1,7 +1,7 @@
 import torch
 from torch import nn
 from einops import rearrange
-
+import copy
 from layers import Head
 
 
@@ -34,9 +34,8 @@ class MultiHeadAttention(nn.Module):
         self.projection = nn.Linear(self.num_heads * self.head_dim, self.out_dim)
         self.projection.weight.data[:, :(self.num_heads - 1) * self.head_dim] = old_projection.weight.data
         self.projection.bias.data = old_projection.bias.data
-
+        new_head = copy.deepcopy(self.heads[-1])
         # Freeze the old heads
-        # for head in self.heads:
-        #     head.requires_grad_(False)
-        new_head = Head(self.in_dim, self.head_dim)
+        for head in self.heads:
+            head.requires_grad_(False)
         self.heads.append(new_head)
