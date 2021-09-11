@@ -1,10 +1,10 @@
 epochs:
   100
 project_name:
-  head_inc_cct_with_superimpose_pooling
+  head_inc_cct_with_superimpose_pooling_distillation
 batch_size:
   256
 learning_rate:
   0.0005
 desicription:
-  This is used to check how attention head superimposing and pooling affect performance
+  This is used to check how attention head superimposing and pooling affect performance. Added distillation also

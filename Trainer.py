@@ -13,6 +13,7 @@ from augmentations import CIFAR10Policy
 from torch import optim
 from torch.nn import functional as F
 from utils import save_checkpoint, ensure_dir, load_checkpoint
+import copy
 
 device = torch.device("cuda" if torch.cuda.is_available() else 'cpu')
 
@@ -35,7 +36,7 @@ def adjust_learning_rate(optimizer, epoch, learning_rate, final_epoch, warmup=0)
 
 
 class Trainer:
-    def __init__(self, epochs, learning_rate, batch_size, task_size, num_class):
+    def __init__(self, epochs, learning_rate, batch_size, task_size, num_class, distill=True):
         super(Trainer, self).__init__()
         self.epochs = epochs
         self.learning_rate = learning_rate
@@ -60,18 +61,21 @@ class Trainer:
         self.opt = None
         self.exemplar_set = []
         self.memory_size = 2000
+        self.old_model = None
+        self.distill = distill
 
     def beforeTrain(self):
         self.model.eval()
         classes = [self.num_class - self.task_size, self.num_class]
         self.train_loader, self.test_loader = self._get_train_and_test_dataloader(classes)
         if self.num_class > self.task_size:
+            self.old_model = copy.deepcopy(self.model)
             self.model.incremental_learning(self.num_class)
         self.model.train()
         self.model.to(device)
 
     def _get_train_and_test_dataloader(self, classes):
-        self.train_dataset.getTrainData(classes,self.exemplar_set)
+        self.train_dataset.getTrainData(classes, self.exemplar_set)
         self.test_dataset.getTestData(classes)
         train_loader = DataLoader(dataset=self.train_dataset,
                                   shuffle=True,
@@ -83,7 +87,7 @@ class Trainer:
 
         return train_loader, test_loader
 
-    def train(self,resume=False,task_id=1):
+    def train(self, resume=False, task_id=1):
         if resume:
             print("Loading from previous state dict")
             directory = './checkpoint'
@@ -130,11 +134,19 @@ class Trainer:
 
     def _compute_loss(self, index, imgs, target):
         output = self.model(imgs)
-        target = get_one_hot(target, self.num_class)
         output, target = output.to(device), target.to(device)
-        return F.binary_cross_entropy_with_logits(output, target)
+        distillation_loss = 0
+        alpha = (self.num_class - self.task_size) / self.num_class
+        if self.old_model is not None:
+            with torch.no_grad():
+                output_hat = self.old_model(imgs)
+                pi_hat = F.softmax(output_hat, dim=1)
+            log_pi = F.log_softmax(output[:, :self.num_class - self.task_size], dim=1)
+            distillation_loss = torch.mean(torch.sum(-pi_hat * log_pi, dim=1))
+        classification_loss = F.cross_entropy(output, target.to(torch.long))
+        return distillation_loss * alpha + classification_loss * (1 - alpha)
 
-    def afterTrain(self, task_id,no_save=False):
+    def afterTrain(self, task_id, no_save=False):
         self.model.eval()
         m = int(self.memory_size / self.num_class)
         self._reduce_exemplar_sets(m)
