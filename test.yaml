@@ -1,10 +1,10 @@
 epochs:
-  100
+  6
 project_name:
-  head_inc_cct_with_superimpose_pooling_distillation
+  head_inc_cct_with_bias_correction
 batch_size:
-  256
+  64
 learning_rate:
   0.0005
 desicription:
-  This is used to check how attention head superimposing and pooling affect performance. Added distillation also
+  This is used to check how bias correction influence the accuracy

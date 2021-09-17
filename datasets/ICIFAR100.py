@@ -44,7 +44,7 @@ class ICIFAR100(CIFAR100):
         print("the size of test set is %s" % (str(self.TestData.shape)))
         print("the size of test label is %s" % str(self.TestLabels.shape))
 
-    def getTrainData(self, classes,exemplar_set):
+    def getTrainData(self, classes, exemplar_set):
 
         datas, labels = [], []
         if len(exemplar_set) != 0:
@@ -53,11 +53,25 @@ class ICIFAR100(CIFAR100):
             labels = [np.full((length), label) for label in range(len(exemplar_set))]
         for label in range(classes[0], classes[1]):
             data = self.data[np.array(self.targets) == label]
-            datas.append(data)
-            labels.append(np.full((data.shape[0]), label))
+            datas.append(data[:400])
+            labels.append(np.full((400), label))
         self.TrainData, self.TrainLabels = self.concatenate(datas, labels)
         print("the size of train set is %s" % (str(self.TrainData.shape)))
         print("the size of train label is %s" % str(self.TrainLabels.shape))
+
+    def getValData(self, classes, exemplar_set):
+        datas, labels = [], []
+        if len(exemplar_set) != 0:
+            datas = [exemplar for exemplar in exemplar_set]
+            length = len(datas[0])
+            labels = [np.full((length), label) for label in range(len(exemplar_set))]
+        for label in range(classes[0], classes[1]):
+            data = self.data[np.array(self.targets) == label]
+            datas.append(data[400:])
+            labels.append(np.full((100), label))
+        self.TrainData, self.TrainLabels = self.concatenate(datas, labels)
+        print("the size of val set is %s" % (str(self.TrainData.shape)))
+        print("the size of val label is %s" % str(self.TrainLabels.shape))
 
     def getTrainItem(self, index):
         img, target = Image.fromarray(self.TrainData[index]), self.TrainLabels[index]
