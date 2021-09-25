@@ -1,7 +1,7 @@
 epochs:
   100
 project_name:
-  head_inc_cct_with_bias_correction
+  cct_with_rand_head
 batch_size:
   64
 learning_rate:
