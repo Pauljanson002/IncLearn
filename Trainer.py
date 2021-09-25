@@ -128,14 +128,16 @@ class Trainer:
                 opt.step()
                 total_loss += loss_value.item()
                 total_images += images.size(0)
+            training_accuracy = self._test(self.train_loader)
             accuracy = self._test(self.test_loader)
             avg_loss = total_loss / total_images if total_images != 0 else 1000
             wandb.log({
                 "epoch": epoch,
                 "training_avg_loss": avg_loss,
-                "test_accuracy": accuracy
+                "test_accuracy": accuracy,
+                "training_accuracy":training_accuracy
             })
-            print('epoch:%d,accuracy:%.3f' % (epoch, accuracy))
+            print('epoch:%d,accuracy:%.3f,training_accuracy:%.3f' % (epoch, accuracy,training_accuracy))
         if task_id>1:
             bias_optimizer = optim.AdamW(self.bias_layers[task_id-1].parameters(), lr=0.001, weight_decay=3e-2)
             for epoch in range(1,self.epochs+1):

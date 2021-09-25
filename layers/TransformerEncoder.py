@@ -4,7 +4,7 @@ from layers import TransformerEncoderBlock
 
 
 class TransformerEncoder(nn.Module):
-    def __init__(self, depth=12, dropout_rate=0.1, stochastic_depth_rate=0.1):
+    def __init__(self, depth=7, dropout_rate=0.1, stochastic_depth_rate=0.1):
         super(TransformerEncoder, self).__init__()
         self.dropout = nn.Dropout(dropout_rate)
         dpr = [i.item() for i in torch.linspace(0, stochastic_depth_rate, depth)]

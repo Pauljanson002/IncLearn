@@ -14,9 +14,12 @@ class PatchEmbedding(nn.Module):
         if convolution:
             self.convolution = True
             self.projection = nn.Sequential(
-                nn.Conv2d(in_channels, emb_size, kernel_size=3, stride=1, padding=1, bias=False),
+                nn.Conv2d(in_channels, emb_size, kernel_size=2, stride=1, padding=1, bias=False),
                 nn.ReLU(),
-                nn.MaxPool2d(kernel_size=3, stride=4, padding=1)
+                nn.MaxPool2d(kernel_size=2, stride=2, padding=0),
+                nn.Conv2d(emb_size, emb_size, kernel_size=2, stride=1, padding=1, bias=False),
+                nn.ReLU(),
+                nn.MaxPool2d(kernel_size=2)
             )
         else:
             self.sequence_length += 1

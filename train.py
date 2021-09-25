@@ -30,7 +30,8 @@ if __name__ == '__main__':
         'epochs': args.epochs,
         'project_name': args.project_name,
         'batch_size': args.batch_size,
-        'learning_rate': args.learning_rate
+        'learning_rate': args.learning_rate,
+        "task_id":args.task_id
     }
     run = wandb.init(
         project=args.project_name,

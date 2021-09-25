@@ -3,7 +3,7 @@ epochs:
 project_name:
   head_inc_cct_with_bias_correction
 batch_size:
-  256
+  64
 learning_rate:
   0.0005
 desicription:
