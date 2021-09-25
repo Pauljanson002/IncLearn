@@ -24,8 +24,8 @@ class MultiHeadAttention(nn.Module):
         head_output = torch.tensor([],device='cuda')
         x = rearrange(x,'b n (h d) -> b h n d',h=self.multi_head_count)
         random_head_list = sorted(random.sample(range(0,self.num_heads),self.multi_head_count))
-        print("Heads selected")
-        print(random_head_list)
+        # print("Heads selected")
+        # print(random_head_list)
         for (i,head_loc) in enumerate(random_head_list):
             head = self.heads[head_loc]
             per_head = head(x[:,i])
