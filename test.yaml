@@ -1,9 +1,9 @@
 epochs:
-  6
+  100
 project_name:
   Tinyimagenet
 batch_size:
-  2
+  64
 learning_rate:
   0.0005
 desicription:
