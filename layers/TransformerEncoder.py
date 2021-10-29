@@ -13,10 +13,18 @@ class TransformerEncoder(nn.Module):
         ])
         self.apply(self.init_weight)
 
-    def forward(self, x):
+    def forward(self, x,require_attention=False):
         x = self.dropout(x)
-        for blk in self.blocks:
+        attn = None
+        for (i, blk) in enumerate(self.blocks):
             x = blk(x)
+            if i == len(self.blocks)-1:
+                if require_attention:
+                    x,attn = blk(x,require_attention=True)
+                else:
+                    x = blk(x)
+        if require_attention:
+            return x,attn
         return x
 
     @staticmethod

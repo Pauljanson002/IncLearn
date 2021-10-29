@@ -4,7 +4,7 @@ from torch.nn import functional as F
 
 
 class Head(nn.Module):
-    def __init__(self, emb_dim=256,head_dim= 256, dropout=0.1):
+    def __init__(self, emb_dim=256,head_dim= 32, dropout=0.1):
         super(Head, self).__init__()
         self.head_dim = head_dim
         self.queries = nn.Linear(self.head_dim, self.head_dim, bias=False)
@@ -13,7 +13,7 @@ class Head(nn.Module):
         self.att_drop = nn.Dropout(dropout)
         self.scaling = self.head_dim ** -0.5
 
-    def forward(self, x):
+    def forward(self, x,require_attention=False):
         queries = self.queries(x)
         keys = self.keys(x)
         values = self.values(x)
@@ -21,5 +21,7 @@ class Head(nn.Module):
         att = F.softmax(energy, dim=-1) * self.scaling
         att = self.att_drop(att)
         out = torch.einsum('bal,blv -> bav', att, values)
+        if require_attention:
+            return out,att
         return out
 

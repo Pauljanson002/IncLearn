@@ -8,9 +8,13 @@ class ViT(nn.Module):
         super(ViT, self).__init__()
         self.patch_embedding = PatchEmbedding(in_channels, patch_size, emb_size, img_size, convolution=convolution)
         self.transformer_encoder = TransformerEncoder(depth)
-        self.classification_head = ClassificationHead(emb_size, n_classes,convolution=convolution)
+        self.classification_head = ClassificationHead(emb_size, n_classes, convolution=convolution)
 
-    def forward(self, x):
+    def forward(self, x, require_attention=False):
+        if require_attention:
+            x, attn = self.transformer_encoder(self.patch_embedding(x), require_attention=True)
+            x = self.classification_head(x)
+            return x, attn
         x = self.classification_head(self.transformer_encoder(self.patch_embedding(x)))
         return x
 

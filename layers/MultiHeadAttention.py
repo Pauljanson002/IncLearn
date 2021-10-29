@@ -8,31 +8,37 @@ from layers import Head
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, num_heads=4, in_dim=256, head_dim=64, out_dim=256):
+    def __init__(self, num_heads=8, in_dim=256, head_dim=64, out_dim=256):
         super(MultiHeadAttention, self).__init__()
         self.num_heads = num_heads
         self.head_dim = head_dim
         self.in_dim = in_dim
         self.out_dim = out_dim
-        self.projection = nn.Linear(num_heads*head_dim, out_dim)
+        self.projection = nn.Linear(num_heads * head_dim, out_dim)
         self.heads = nn.ModuleList([
             Head(head_dim, head_dim) for i in range(num_heads)
         ])
-        self.multi_head_count = 4
+        self.multi_head_count = 8
 
-    def forward(self, x):
-        head_output = torch.tensor([],device='cuda')
-        x = rearrange(x,'b n (h d) -> b h n d',h=self.multi_head_count)
-        random_head_list = sorted(random.sample(range(0,self.num_heads),self.multi_head_count))
-        # print("Heads selected")
-        # print(random_head_list)
-        for (i,head_loc) in enumerate(random_head_list):
-            head = self.heads[head_loc]
-            per_head = head(x[:,i])
-            head_output = torch.cat([head_output,per_head],dim=-1)
-        out = head_output
-        #out = rearrange(out, 'b h n d -> b n (h d)')
+    def forward(self, x, require_attention=False):
+        head_output = []
+        attn_output = []
+        x = rearrange(x, 'b n (h d) -> b h n d', h=self.multi_head_count)
+        for (i, head) in enumerate(self.heads):
+            if require_attention:
+                per_head,attn = head(x[:, i],require_attention=True)
+                attn_output.append(attn)
+            else:
+                per_head = head(x[:, i])
+            head_output.append(per_head)
+        out = torch.stack(head_output, dim=1)
+        if require_attention:
+            attn = torch.stack(attn_output,dim=1)
+        out = rearrange(out, 'b h n d -> b n (h d)')
         out = self.projection(out)
+        if require_attention:
+            print(attn.shape)
+            return out,attn
         return out
 
     def increaseHead(self):

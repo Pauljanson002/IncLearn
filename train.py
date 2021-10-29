@@ -18,20 +18,21 @@ if __name__ == '__main__':
     # Todo add model as argument
     parser.add_argument('--batch_size', type=int, default=128)
     parser.add_argument('--learning_rate', type=float, default=0.1)
-    parser.add_argument('--task_id',type=int,default=1)
-
+    parser.add_argument('--task_id', type=int, default=1)
+    parser.add_argument("--optimizer", type=str, default="adamw")
     # Wandb configs
     os.environ['WANDB_MODE'] = 'offline'
     args = parser.parse_args()
     if args.online:
         os.environ['WANDB_MODE'] = 'online'
-    trainer = Trainer(args.epochs, args.learning_rate, args.batch_size, task_size=10, num_class=10)
+    trainer = Trainer(args.epochs, args.learning_rate, args.batch_size,args.optimizer, task_size=10, num_class=10)
     config = {
         'epochs': args.epochs,
         'project_name': args.project_name,
         'batch_size': args.batch_size,
         'learning_rate': args.learning_rate,
-        "task_id":args.task_id
+        "task_id": args.task_id,
+        "optimizer": args.optimizer
     }
     run = wandb.init(
         project=args.project_name,
@@ -41,12 +42,11 @@ if __name__ == '__main__':
     wandb.run.name = f"task_id : {args.task_id}"
     wandb.watch(trainer.model)
     print(trainer.model)
-    for i in range(1,args.task_id):
+    for i in range(1, args.task_id):
         trainer.beforeTrain()
-        trainer.train(resume=True,task_id=i)
-        trainer.afterTrain(task_id=i,no_save=True)
+        trainer.train(resume=True, task_id=i)
+        trainer.afterTrain(task_id=i, no_save=True)
     trainer.beforeTrain()
-    trainer.train(resume=False,task_id=args.task_id)
-    trainer.afterTrain(task_id=args.task_id,no_save=False)
+    trainer.train(resume=False, task_id=args.task_id)
+    trainer.afterTrain(task_id=args.task_id, no_save=False)
     run.finish()
-
