@@ -36,7 +36,7 @@ def adjust_learning_rate(optimizer, epoch, learning_rate, final_epoch, warmup=0)
 
 
 class Trainer:
-    def __init__(self, epochs, learning_rate, batch_size,optimizer,task_size, num_class, distill=True,dataset_name="tinyimagenet"):
+    def __init__(self, epochs, learning_rate, batch_size,optimizer,task_size, num_class, distill=True,dataset_name="cifar100"):
         super(Trainer, self).__init__()
         self.epochs = epochs
         self.learning_rate = learning_rate
@@ -100,7 +100,7 @@ class Trainer:
                 images, target = images.to(device), target.to(device)
                 loss_value = self._compute_loss(indexs, images, target)
                 opt.zero_grad()
-                loss_value.backward(retain_graph=True)
+                loss_value.backward()
                 opt.step()
                 total_loss += loss_value.item()
                 total_images += images.size(0)
@@ -132,18 +132,21 @@ class Trainer:
         return accuracy
 
     def _compute_loss(self, index, imgs, target):
-        output = self.model(imgs)
-        output, target = output.to(device), target.to(device)
+        output,attn = self.model(imgs,require_attention=True)
+        output, target,attn = output.to(device), target.to(device),attn.to(device)
         distillation_loss = 0
+        attention_loss = 0
+        beta = 0.5
         alpha = (self.num_class - self.task_size) / self.num_class
         if self.old_model is not None:
             with torch.no_grad():
-                output_hat = self.old_model(imgs)
+                output_hat,old_attn = self.old_model(imgs,require_attention=True)
                 pi_hat = F.softmax(output_hat, dim=1)
             log_pi = F.log_softmax(output[:, :self.num_class - self.task_size], dim=1)
             distillation_loss = torch.mean(torch.sum(-pi_hat * log_pi, dim=1))
+            attention_loss = torch.linalg.norm((attn-old_attn))
         classification_loss = F.cross_entropy(output, target.to(torch.long))
-        return distillation_loss * alpha + classification_loss * (1 - alpha)
+        return distillation_loss * alpha + classification_loss * (1 - alpha) + beta * attention_loss
 
     def afterTrain(self, task_id, no_save=False):
         self.model.eval()

@@ -37,7 +37,6 @@ class MultiHeadAttention(nn.Module):
         out = rearrange(out, 'b h n d -> b n (h d)')
         out = self.projection(out)
         if require_attention:
-            print(attn.shape)
             return out,attn
         return out
 

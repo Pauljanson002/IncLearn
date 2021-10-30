@@ -3,7 +3,7 @@ from torch import nn
 
 
 class IncVit(ViT):
-    def __init__(self, in_channels=3, n_classes=100, emb_size=256, depth=7, img_size=64, patch_size=4,
+    def __init__(self, in_channels=3, n_classes=100, emb_size=256, depth=7, img_size=32, patch_size=4,
                  convolution=False):
         super(IncVit, self).__init__(in_channels=in_channels, n_classes=n_classes,
                                      emb_size=emb_size,

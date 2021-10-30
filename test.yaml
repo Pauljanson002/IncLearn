@@ -1,7 +1,7 @@
 epochs:
-  100
+  10
 project_name:
-  Tinyimagenet
+  Withattentionregularization
 batch_size:
   64
 learning_rate:
