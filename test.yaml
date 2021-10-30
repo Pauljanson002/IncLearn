@@ -1,5 +1,5 @@
 epochs:
-  10
+  100
 project_name:
   Withattentionregularization
 batch_size:
@@ -7,4 +7,4 @@ batch_size:
 learning_rate:
   0.0005
 desicription:
-  This is used to check how bias correction influence the accuracy
+  This is to check attention regularization
