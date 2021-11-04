@@ -3,7 +3,7 @@ from layers import PatchEmbedding, TransformerEncoder, ClassificationHead
 
 
 class ViT(nn.Module):
-    def __init__(self, in_channels=3, n_classes=100, emb_size=256, depth=7, img_size=32, patch_size=4,
+    def __init__(self, in_channels=3, n_classes=100, emb_size=256, depth=7, img_size=32, patch_size=3,
                  convolution=False):
         super(ViT, self).__init__()
         self.patch_embedding = PatchEmbedding(in_channels, patch_size, emb_size, img_size, convolution=convolution)

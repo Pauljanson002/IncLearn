@@ -1,7 +1,7 @@
 epochs:
   100
 project_name:
-  Withattentionregularization
+  WithattentionregularizationReducedPatchSize
 batch_size:
   64
 learning_rate:
