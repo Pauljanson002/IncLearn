@@ -4,10 +4,10 @@ from layers.DropPath import DropPath
 
 
 class TransformerEncoderBlock(nn.Module):
-    def __init__(self, emb_dim=128, num_heads=8, dropout=0.1, drop_path_rate=0.1):
+    def __init__(self, emb_dim=64, num_heads=8, dropout=0.1, drop_path_rate=0.1):
         super(TransformerEncoderBlock, self).__init__()
         self.pre_norm = nn.LayerNorm(emb_dim)
-        self.mha = MultiHeadAttention(num_heads=num_heads, in_dim=128, head_dim=16, out_dim=128)
+        self.mha = MultiHeadAttention(num_heads=num_heads, in_dim=64, head_dim=8, out_dim=64)
         self.dropout1 = nn.Dropout(dropout)
         self.ff = FeedForwardBlock(emb_size=emb_dim)
         self.norm1 = nn.LayerNorm(emb_dim)
