@@ -8,7 +8,7 @@ from layers import Head
 
 
 class MultiHeadAttention(nn.Module):
-    def __init__(self, num_heads=8, in_dim=256, head_dim=64, out_dim=256):
+    def __init__(self, num_heads=8, in_dim=128, head_dim=16, out_dim=128):
         super(MultiHeadAttention, self).__init__()
         self.num_heads = num_heads
         self.head_dim = head_dim

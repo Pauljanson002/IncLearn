@@ -5,7 +5,7 @@ from einops import rearrange
 
 
 class ClassificationHead(nn.Module):
-    def __init__(self, emb_size=256, n_classes=100, convolution=False):
+    def __init__(self, emb_size=128, n_classes=100, convolution=False):
         super(ClassificationHead, self).__init__()
         self.layer_norm = nn.LayerNorm(emb_size)
         self.linear = nn.Linear(emb_size, n_classes)

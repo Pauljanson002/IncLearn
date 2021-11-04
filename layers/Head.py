@@ -4,7 +4,7 @@ from torch.nn import functional as F
 
 
 class Head(nn.Module):
-    def __init__(self, emb_dim=256,head_dim= 32, dropout=0.1):
+    def __init__(self, emb_dim=128,head_dim= 32, dropout=0.1):
         super(Head, self).__init__()
         self.head_dim = head_dim
         self.queries = nn.Linear(self.head_dim, self.head_dim, bias=False)

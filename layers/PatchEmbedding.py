@@ -6,7 +6,7 @@ from einops.layers.torch import Rearrange
 
 
 class PatchEmbedding(nn.Module):
-    def __init__(self, in_channels=3, patch_size=3, emb_size=256, img_size=32, convolution=False):
+    def __init__(self, in_channels=3, patch_size=3, emb_size=128, img_size=32, convolution=False):
         super(PatchEmbedding, self).__init__()
         self.patch_size = patch_size
         self.sequence_length = (img_size // 2) ** 2

@@ -25,4 +25,4 @@ def inc_vit_b():
 
 
 def inc_cct_b():
-    return IncVit(n_classes=10, convolution=True)
+    return IncVit(n_classes=10, emb_size=128, convolution=True)
