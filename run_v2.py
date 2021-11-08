@@ -3,14 +3,16 @@ from yaml import load,load_all,dump_all,Loader, Dumper
 from easydict import EasyDict
 from argparse import ArgumentParser
 if __name__ == '__main__':
-    f = open("test.yaml","r")
-    config = load(f,Loader=Loader)
-    experiment = EasyDict(config)
     parser = ArgumentParser("Experiment argument parser")
     parser.add_argument("--task_id",type=int, default=1)
+    parser.add_argument("--config",type=str,default="test")
     parser.add_argument("--online",action="store_true")
+    f = open(f"config/{parser.config}.yaml", "r")
+    config = EasyDict(load(f, Loader=Loader))
     args = parser.parse_args()
-    command = f"python3 -u train.py --epochs {experiment.epochs} --project_name {experiment.project_name}  --batch_size {experiment.batch_size} --learning_rate {experiment.learning_rate} --task_id {args.task_id}"
+    command = f"python -u train.py --epochs {config.epochs} --project_name {config.project_name}  --batch_size {config.batch_size} --learning_rate {config.learning_rate} --task_id {args.task_id}"
     if args.online:
         command += " --online"
     os.system(command)
+
+
