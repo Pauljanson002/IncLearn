@@ -96,7 +96,7 @@ class Trainer:
             self.model.train()
 
             for step, (indexs, images, target) in tqdm(enumerate(self.train_loader), total=len(self.train_loader),
-                                                       desc='Training'):
+                                                       desc='Training',position=0, leave=True):
                 images, target = images.to(device), target.to(device)
                 loss_value = self._compute_loss(indexs, images, target)
                 opt.zero_grad()
@@ -120,7 +120,7 @@ class Trainer:
     def _test(self, test_loader):
         self.model.eval()
         correct, total = 0, 0
-        for step, (index, imgs, labels) in tqdm(enumerate(test_loader), desc="Testing", total=len(test_loader)):
+        for step, (index, imgs, labels) in tqdm(enumerate(test_loader), desc="Testing", total=len(test_loader),leave=True,position=0):
             imgs, labels = imgs.to(device), labels.to(device)
             with torch.no_grad():
                 outputs = self.model(imgs)
