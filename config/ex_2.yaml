@@ -1,0 +1,10 @@
+epochs:
+  100
+project_name:
+  AttentionRegularizationForOldClassesonly_26Nov
+batch_size:
+  64
+learning_rate:
+  0.0005
+desicription:
+  This is to check the attention regularization

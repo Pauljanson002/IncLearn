@@ -34,6 +34,11 @@ def adjust_learning_rate(optimizer, epoch, learning_rate, final_epoch, warmup=0)
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
+def attention_distillation_loss(attention_map1, attention_map2):
+    """Calculates the attention distillation loss"""
+    attn_difference = attention_map1 - attention_map2
+    att_norm_each_head = torch.linalg.norm(attn_difference, dim=(2, 3), ord="fro")
+    return F.normalize(att_norm_each_head, p=2., dim=1).mean(dim=1).mean()
 
 class Trainer:
     def __init__(self, epochs, learning_rate, batch_size,optimizer,task_size, num_class, distill=True,dataset_name="cifar100"):
@@ -144,7 +149,13 @@ class Trainer:
                 pi_hat = F.softmax(output_hat, dim=1)
             log_pi = F.log_softmax(output[:, :self.num_class - self.task_size], dim=1)
             distillation_loss = torch.mean(torch.sum(-pi_hat * log_pi, dim=1))
-            attention_loss = torch.linalg.norm((attn-old_attn))
+            selected_classes = (target<(self.num_class-self.task_size))
+            attention_loss = attention_distillation_loss(attn[selected_classes],old_attn[selected_classes])
+            wandb.log({
+                "attention_loss":attention_loss,
+                "num_class":self.num_class,
+                "selected_classes":len(selected_classes)
+            })
         classification_loss = F.cross_entropy(output, target.to(torch.long))
         return distillation_loss * alpha + classification_loss * (1 - alpha) + beta * attention_loss
 

@@ -21,7 +21,7 @@ class IncVit(ViT):
 
 
 def inc_vit_b():
-    return IncVit(n_classes=10)
+    return IncVit(n_classes=10,emb_size=128,patch_size=4)
 
 
 def inc_cct_b():
